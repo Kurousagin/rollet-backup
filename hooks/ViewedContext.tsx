@@ -6,11 +6,17 @@ interface ViewedContextProps {
   viewed: ImageSourcePropType[];
   addViewed: (card: ImageSourcePropType) => void;
   isViewed: (card: ImageSourcePropType) => boolean;
+  clearViewed: () => void;
 }
 
 const ViewedContext = createContext<ViewedContextProps | undefined>(undefined);
 
 export const ViewedProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Função para limpar todas as cartas vistas
+  const clearViewed = async () => {
+    setViewed([]);
+    await AsyncStorage.removeItem('viewed');
+  };
   const [viewed, setViewed] = useState<ImageSourcePropType[]>([]);
 
   // Carrega cartas visualizadas do AsyncStorage ao iniciar
@@ -50,7 +56,7 @@ export const ViewedProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <ViewedContext.Provider value={{ viewed, addViewed, isViewed }}>
+    <ViewedContext.Provider value={{ viewed, addViewed, isViewed, clearViewed }}>
       {children}
     </ViewedContext.Provider>
   );

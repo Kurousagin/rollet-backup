@@ -1,18 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useState } from 'react';
-import { ImageSourcePropType } from 'react-native';
 
 interface FavoritesContextProps {
-  favorites: ImageSourcePropType[];
-  addFavorite: (card: ImageSourcePropType) => void;
-  removeFavorite: (card: ImageSourcePropType) => void;
-  isFavorite: (card: ImageSourcePropType) => boolean;
+  favorites: string[]; // lista de uris
+  addFavorite: (uri: string) => void;
+  removeFavorite: (uri: string) => void;
+  isFavorite: (uri: string) => boolean;
 }
 
 const FavoritesContext = createContext<FavoritesContextProps | undefined>(undefined);
 
 export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [favorites, setFavorites] = useState<ImageSourcePropType[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   
   // Carrega favoritos do AsyncStorage ao iniciar
   React.useEffect(() => {
@@ -23,23 +22,23 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   
   // Salva favoritos no AsyncStorage sempre que mudar
   React.useEffect(() => {
-    AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+  AsyncStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  const addFavorite = (card: ImageSourcePropType) => {
+  const addFavorite = (uri: string) => {
     setFavorites((prev) => {
-      if (!prev.includes(card)) {
-        return [...prev, card];
+      if (!prev.includes(uri)) {
+        return [...prev, uri];
       }
       return prev;
     });
   };
 
-  const removeFavorite = (card: ImageSourcePropType) => {
-    setFavorites((prev) => prev.filter((fav) => fav !== card));
+  const removeFavorite = (uri: string) => {
+    setFavorites((prev) => prev.filter((fav) => fav !== uri));
   };
 
-  const isFavorite = (card: ImageSourcePropType) => favorites.includes(card);
+  const isFavorite = (uri: string) => favorites.includes(uri);
 
   return (
     <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite }}>
